@@ -8,7 +8,6 @@
 ![GitHub contributors](https://img.shields.io/github/contributors/stlink-org/stlink)
 [![CodeQL](https://github.com/stlink-org/stlink/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/stlink-org/stlink/actions/workflows/codeql-analysis.yml)
 [![C/C++ CI](https://github.com/stlink-org/stlink/actions/workflows/c-cpp.yml/badge.svg?branch=testing)](https://github.com/stlink-org/stlink/actions/workflows/c-cpp.yml)
-[![Linux Status](https://img.shields.io/travis/stlink-org/stlink/master?env=BADGE=linux&label=linux)](https://travis-ci.org/stlink-org/stlink)
 
 Recent new features and bugfixes can be found in the [Changelog](CHANGELOG.md) of this software project.
 
@@ -50,7 +49,7 @@ The STlink toolset includes:
 
 ## Supported operating systems and hardware combinations
 
-Currently known working MCU targets are listed in [devices_boards.md](doc/devices_boards.md).
+Currently known working MCU targets are listed in [supported_devices.md](doc/supported_devices.md).
 
 A list of supported operating can be found in [version_support.md](doc/version_support.md).
 
@@ -75,11 +74,16 @@ We recommend to install `stlink-tools` from the package repository of the used d
 
 - Debian Linux: [(Link)](https://github.com/stlink-org/stlink/releases)
 - Ubuntu Linux: [(Link)](https://github.com/stlink-org/stlink/releases)
-- Arch Linux: [(Link)](https://www.archlinux.org/packages/community/x86_64/stlink)
+- Arch Linux: [(Link)](https://archlinux.org/packages/extra/x86_64/stlink/)
 - Alpine Linux: [(Link)](https://pkgs.alpinelinux.org/packages?name=stlink)
 - Fedora: [(Link)](https://src.fedoraproject.org/rpms/stlink)
 - FreeBSD: Users can install from [freshports](https://www.freshports.org/devel/stlink)
-- MacOS: **Support for macOS will end with v1.7.1.** Please use v1.7.0 (current ***master*** branch) and the related documentation instead.
+
+**macOS**:
+
+**Support for macOS will be dropped with v1.8.0.**
+
+Please use v1.7.0 instead, **but note that this version is no longer maintained and supported!**
 
 ## Installation from source (advanced users)
 

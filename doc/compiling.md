@@ -8,7 +8,8 @@ On Windows users should ensure that the following software is installed:
 
 - `git` (_optional, but recommended_)
 - `cmake`
-- `MinGW-w64` (7.0.0 or later) with GCC toolchain 8.1.0
+- `7-zip`
+- `MinGW-w64`
 
 ### Installation
 
@@ -17,13 +18,13 @@ On Windows users should ensure that the following software is installed:
    Ensure that you add cmake to the $PATH system variable when following the instructions by the setup assistant.
 3. Install
 
-- _EITHER_: **MinGW-w64** from <https://sourceforge.net/projects/mingw-w64> (mingw-w64-install.exe)<br />
-- _OR_: **MSVC toolchain** from Visual Studio Build Tools 2019
+   - _EITHER_: Download **MinGW-w64** from <hhttp://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-win32/sjlj/x86_64-8.1.0-release-win32-sjlj-rt_v6-rev0.7z>. Extract content to `C:\mingw-w64\` and add `C:\mingw-w64\bin\` to PATH-Variable.<br />
+   - _OR_: **MSVC toolchain** from Visual Studio Build Tools 2019
 
 4. Create a new destination folder at a place of your choice
 5. Open the command-line (cmd.exe) and execute `cd C:\$Path-to-your-destination-folder$\`
 6. Fetch the project sourcefiles by running `git clone https://github.com/stlink-org/stlink.git`from the command-line (cmd.exe)<br />
-   or download the stlink zip-sourcefolder from the Release page on GitHub
+   or download and extract the stlink zip-sourcefolder from the Release page on GitHub.
 
 #### MSVC toolchain - minimal installation
 
@@ -48,11 +49,12 @@ Visual Studio IDE is not necessary, only Windows SDK & build tools are required 
 
 #### MinGW-w64
 
-1. Use the command-line to move to the `scripts` directory within the source-folder: `cd stlink\scripts\`
-2. Execute `./mingw64-build.bat`
+1. Open command-line with administrator privileges
+2. Move to the `stlink` directory
+3. Execute `mingw64-build.bat`
 
 NOTE:<br />
-Per default the build script (currently) uses `C:\Program Files\mingw-w64\x86_64-8.1.0-release-win32-sjlj-rt_v6-rev0\mingw64\bin`.<br />
+Per default the build script (currently) uses `C:\mingw-w64\x86_64-8.1.0-release-win32-sjlj-rt_v6-rev0\mingw64\bin`.<br />
 When installing different toolchains make sure to update the path in the `mingw64-build.bat`.<br />
 This can be achieved by opening the .bat file with a common text editor.
 
@@ -123,7 +125,7 @@ or execute (Debian-based systems only): `apt-get install gcc build-essential cma
 4. Run `make install` to full install the package with complete system integration. This might require sudo permissions.
 5. Run `make debug` to create the _Debug_ target (_optional_)<br />
    The debug target is only necessary in order to modify the sources and to run under a debugger.
-6. Run `make package`to build a Debian Package. The generated packages can be found in the subdirectory `./build/dist`.
+6. Run `make package`to build a Debian Package. The generated packages can be found in the subdirectory `./build/Release/dist`.
 
 As an option you may also install to an individual user-defined folder e.g `$HOME` with `make install DESTDIR=$HOME`.
 
@@ -199,5 +201,7 @@ Below are the preset default cmake options, which apply if none of these options
 
 - `-DCMAKE_INSTALL_SYSCONFDIR=/etc`
 - `-DCMAKE_INSTALL_PREFIX=/usr/local`
+
+Please refer to the related [cmake documentation](https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html) for details.
 
 Author: nightwalker-87

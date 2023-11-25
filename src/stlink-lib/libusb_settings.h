@@ -1,3 +1,9 @@
+/*
+ * File: libusb_settings.h
+ *
+ * Settings for libusb library
+ */
+
 #ifndef LIBUSB_SETTINGS_H
 #define LIBUSB_SETTINGS_H
 
@@ -33,9 +39,9 @@
 #if defined (__FreeBSD__)
     #define MINIMAL_API_VERSION 0x01000102 // v1.0.16
 #elif defined (__OpenBSD__)
-    #define MINIMAL_API_VERSION 0x01000105 // v1.0.21
+    #define MINIMAL_API_VERSION 0x01000106 // v1.0.22
 #elif defined (__linux__)
-    #define MINIMAL_API_VERSION 0x01000105 // v1.0.21
+    #define MINIMAL_API_VERSION 0x01000106 // v1.0.22
 #elif defined (_WIN32)
     #define MINIMAL_API_VERSION 0x01000109 // v1.0.25
 #endif

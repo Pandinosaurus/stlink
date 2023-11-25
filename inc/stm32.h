@@ -7,11 +7,13 @@
 #ifndef STM32_H
 #define STM32_H
 
+#include <stdint.h>
+
 /* STM32 Cortex-M core ids (CPUTAPID) */
 enum stm32_core_id {
     STM32_CORE_ID_M0_SWD        = 0x0bb11477,   // (RM0091 Section 32.5.3) F0 SW-DP
-                                                // (RM0444 Section 40.5.3) G0 SW-DP
-    STM32_CORE_ID_M0P_SWD       = 0x0bc11477,   // (RM0385 Section 27.5.3) L0 SW-DP
+    STM32_CORE_ID_M0P_SWD       = 0x0bc11477,   // (RM0444 Section 40.5.3) G0 SW-DP
+                                                // (RM0377 Section 27.5.3) L0 SW-DP
     STM32_CORE_ID_M3_r1p1_SWD   = 0x1ba01477,   // (RM0008 Section 31.8.3) F1 SW-DP
     STM32_CORE_ID_M3_r1p1_JTAG  = 0x3ba00477,   // (RM0008 Section 31.6.3) F1 JTAG
     STM32_CORE_ID_M3_r2p0_SWD   = 0x2ba01477,   // (RM0033 Section 32.8.3) F2 SW-DP
@@ -29,9 +31,15 @@ enum stm32_core_id {
     STM32_CORE_ID_M4F_r0p1_JTAG = 0x4ba00477,   // (RM0090 Section 38.6.3) F4 JTAG
                                                 // (RM0090 Section 47.6.3) G4 JTAG
     STM32_CORE_ID_M7F_SWD       = 0x5ba02477,   // (RM0385 Section 40.8.3) F7 SW-DP
+                                                // (RM0473 Section 33.4.4) WB SW-DP
+                                                // (RM0453 Section 38.4.1) WL SW-DP
     STM32_CORE_ID_M7F_JTAG      = 0x5ba00477,   // (RM0385 Section 40.6.3) F7 JTAG
-    STM32_CORE_ID_M7F_H7_SWD    = 0x6ba02477,   // (RM0433 Section 60.4.1) H7 SW-DP
-    STM32_CORE_ID_M7F_H7_JTAG   = 0x6ba00477,   // (RM0433 Section 60.4.1) H7 JTAG
+    STM32_CORE_ID_M7F_M33_SWD   = 0x6ba02477,   // (RM0481 Section 58.3.3) H5 SW-DP
+                                                // (RM0433 Section 60.4.1) H7 SW-DP
+    STM32_CORE_ID_M7F_M33_JTAG  = 0x6ba00477,   // (RM0481 Section 58.3.1) H5 JTAG
+                                                // (RM0433 Section 60.4.1) H7 JTAG
+                                                // (RM0473 Section 33.4.1) WB JTAG
+                                                // (RM0453 Section 38.3.8) WL JTAG
     STM32_CORE_ID_M33_SWD       = 0x0be02477,   // (RM0438 Section 52.2.10) L5 SW-DP
                                                 // (RM0456 Section 65.3.3) U5 SW-DP
     STM32_CORE_ID_M33_JTAGD     = 0x0be01477,   // (RM0438 Section 52.2.10) L5 JTAG-DP
@@ -43,17 +51,18 @@ enum stm32_core_id {
 /* STM32 flash types */
 enum stm32_flash_type {
     STM32_FLASH_TYPE_UNKNOWN   =  0,
-    STM32_FLASH_TYPE_F0_F1_F3  =  1,
-    STM32_FLASH_TYPE_F1_XL     =  2,
-    STM32_FLASH_TYPE_F2_F4     =  3,
-    STM32_FLASH_TYPE_F7        =  4,
-    STM32_FLASH_TYPE_G0        =  5,
-    STM32_FLASH_TYPE_G4        =  6,
-    STM32_FLASH_TYPE_H7        =  7,
-    STM32_FLASH_TYPE_L0_L1     =  8,
-    STM32_FLASH_TYPE_L4        =  9,
-    STM32_FLASH_TYPE_L5_U5     = 10,
-    STM32_FLASH_TYPE_WB_WL     = 11,
+    STM32_FLASH_TYPE_C0        =  1,
+    STM32_FLASH_TYPE_F0_F1_F3  =  2,
+    STM32_FLASH_TYPE_F1_XL     =  3,
+    STM32_FLASH_TYPE_F2_F4     =  4,
+    STM32_FLASH_TYPE_F7        =  5,
+    STM32_FLASH_TYPE_G0        =  6,
+    STM32_FLASH_TYPE_G4        =  7,
+    STM32_FLASH_TYPE_H7        =  8,
+    STM32_FLASH_TYPE_L0_L1     =  9,
+    STM32_FLASH_TYPE_L4        = 10,
+    STM32_FLASH_TYPE_L5_U5_H5  = 11,
+    STM32_FLASH_TYPE_WB_WL     = 12,
 };
 
 /* STM32 chip-ids */
@@ -70,7 +79,7 @@ enum stm32_chipids {
     STM32_CHIPID_F1_HD            = 0x414, /* high density */
     STM32_CHIPID_L4               = 0x415,
     STM32_CHIPID_L1_MD            = 0x416, /* medium density */
-    STM32_CHIPID_L0               = 0x417,
+    STM32_CHIPID_L0_CAT3          = 0x417,
     STM32_CHIPID_F1_CONN          = 0x418, /* connectivity line */
     STM32_CHIPID_F4_HD            = 0x419, /* high density */
     STM32_CHIPID_F1_VL_MD_LD      = 0x420, /* value line medium & low density */
@@ -94,6 +103,7 @@ enum stm32_chipids {
     STM32_CHIPID_F0               = 0x440,
     STM32_CHIPID_F412             = 0x441,
     STM32_CHIPID_F09x             = 0x442,
+    STM32_CHIPID_C011xx           = 0x443, /* RM0490 (revision 3), section 26.10.1 "DBG device ID code register (DBG_IDCODE)" */
     STM32_CHIPID_F0xx_SMALL       = 0x444,
     STM32_CHIPID_F04              = 0x445,
     STM32_CHIPID_F303_HD          = 0x446, /* high density */
@@ -103,28 +113,37 @@ enum stm32_chipids {
     STM32_CHIPID_H74xxx           = 0x450, /* RM0433, p.3189 */
     STM32_CHIPID_F76xxx           = 0x451,
     STM32_CHIPID_F72xxx           = 0x452, /* Nucleo F722ZE board */
+    STM32_CHIPID_C031xx           = 0x453, /* RM0490 (revision 3), section 26.10.1 "DBG device ID code register (DBG_IDCODE)" */
+    STM32_CHIPID_U535_U545        = 0x455, /* RM0456, p.3604 */
     STM32_CHIPID_G0_CAT4          = 0x456, /* G051/G061 */
-    STM32_CHIPID_L011             = 0x457,
+    STM32_CHIPID_L0_CAT1          = 0x457,
     STM32_CHIPID_F410             = 0x458,
-    STM32_CHIPID_G0_CAT2          = 0x460, /* G070/G071/G081 */
+    STM32_CHIPID_G0_CAT2          = 0x460, /* G07x/G08x */
     STM32_CHIPID_L496x_L4A6x      = 0x461,
     STM32_CHIPID_L45x_L46x        = 0x462,
     STM32_CHIPID_F413             = 0x463,
     STM32_CHIPID_L41x_L42x        = 0x464,
-    STM32_CHIPID_G0_CAT1          = 0x466, /* G030/G031/G041 */
-    STM32_CHIPID_G0_CAT3          = 0x467, /* G0B1/G0C1 */
+    STM32_CHIPID_G0_CAT1          = 0x466, /* G03x/G04x */
+    STM32_CHIPID_G0_CAT3          = 0x467, /* G0Bx/G0Cx */
     STM32_CHIPID_G4_CAT2          = 0x468, /* RM0440, section 46.6.1 "MCU device ID code" */
     STM32_CHIPID_G4_CAT3          = 0x469,
     STM32_CHIPID_L4Rx             = 0x470, /* RM0432, p.2247, found on the STM32L4R9I-DISCO board */
     STM32_CHIPID_L4PX             = 0x471, /* RM0432, p.2247 */
+    STM32_CHIPID_L5x2xx           = 0x472, /* RM0438, p.2157 */
+    STM32_CHIPID_U5Fx_U5Gx        = 0x476, /* RM0456, p.3604 */
     STM32_CHIPID_G4_CAT4          = 0x479,
     STM32_CHIPID_H7Ax             = 0x480, /* RM0455, p.2863 */
+    STM32_CHIPID_U59x_U5Ax        = 0x481, /* RM0456, p.3604 */
+    STM32_CHIPID_U575_U585        = 0x482, /* RM0456, p.3604 */
     STM32_CHIPID_H72x             = 0x483, /* RM0468, p.3199 */
+    STM32_CHIPID_H5xx             = 0x484, /* RM0481, p.3085 */
     STM32_CHIPID_WB55             = 0x495,
     STM32_CHIPID_WLE              = 0x497,
 };
 
 /* Constant STM32 option bytes base memory address */
+#define STM32_C0_OPTION_BYTES_BASE ((uint32_t)0x1fff7800)
+
 #define STM32_F4_OPTION_BYTES_BASE ((uint32_t)0x40023c14)
 
 #define STM32_H7_OPTION_BYTES_BASE ((uint32_t)0x5200201c)
@@ -178,6 +197,9 @@ enum stm32_chipids {
 #define STM32WB_DBGMCU_APB1FZR1_WWDG_STOP 11
 #define STM32WB_DBGMCU_APB1FZR1_IWDG_STOP 12
 
+#define STM32C0_RCC_AHBENR 0x40021038         // RM0490 (revision 3), section 5.4.25 "RCC register map"
+#define STM32C0_RCC_DMAEN 0x00000001 // DMAEN // RM0490 (revision 3), section 5.4.25 "RCC register map"
+
 #define STM32F1_RCC_AHBENR 0x40021014
 #define STM32F1_RCC_DMAEN 0x00000003 // DMA2EN | DMA1EN
 
@@ -196,10 +218,16 @@ enum stm32_chipids {
 #define STM32L1_RCC_AHBENR 0x4002381C
 #define STM32L1_RCC_DMAEN 0x30000000 // DMA2EN | DMA1EN
 
+#define STM32L5_RCC_AHB1ENR 0x40021048                  // RM0438, p. 91,377
+#define STM32L5_RCC_DMAEN 0x00000003 // DMA2EN | DMA1EN // RM0438, p. 378
+
 #define STM32H7_RCC_AHB1ENR 0x58024538
 #define STM32H7_RCC_DMAEN 0x00000003 // DMA2EN | DMA1EN
 
 #define STM32WB_RCC_AHB1ENR 0x58000048
 #define STM32WB_RCC_DMAEN 0x00000003 // DMA2EN | DMA1EN
+
+#define STM32L5_PWR_CR1 0x40007000                      // RM0438, p. 93,324
+#define STM32L5_PWR_CR1_VOS 9
 
 #endif // STM32_H

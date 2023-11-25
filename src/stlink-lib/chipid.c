@@ -1,12 +1,22 @@
-#include "chipid.h"
-#include <stlink.h>
-#include <stm32.h>
+/*
+ * File: chipid.c
+ *
+ * Chip-ID parametres
+ */
 
-#include <ctype.h>
-#include <errno.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <stm32.h>
+#include <stlink.h>
+#include "chipid.h"
+
+#include "logging.h"
+
+// #include <ctype.h> // TODO: Check use
+// #include <errno.h> // TODO: Check use
 
 static struct stlink_chipid_params *devicelist;
 
@@ -24,6 +34,8 @@ void dump_a_chip(struct stlink_chipid_params *dev) {
   DLOG("option_base 0x%x\n", dev->option_base);
   DLOG("option_size 0x%x\n", dev->option_size);
   DLOG("flags %d\n\n", dev->flags);
+  DLOG("otp_base %d\n\n", dev->otp_base);
+  DLOG("otp_size %d\n\n", dev->otp_size);
 }
 
 struct stlink_chipid_params *stlink_chipid_get_params(uint32_t chip_id) {
@@ -43,7 +55,7 @@ void process_chipfile(char *fname) {
   char *p, buf[256];
   char word[64], value[64];
   struct stlink_chipid_params *ts;
-  int nc;
+  int32_t nc;
 
   // fprintf (stderr, "processing chip-id file %s.\n", fname);
   fp = fopen(fname, "r");
@@ -64,7 +76,10 @@ void process_chipfile(char *fname) {
         (strncmp(buf, " ", strlen(" ")) == 0))
       continue; // ignore empty lines
 
-    sscanf(buf, "%s %s", word, value);
+    if (sscanf(buf, "%63s %63s", word, value) != 2) {
+      fprintf(stderr, "Failed to read keyword or value\n");
+      continue;
+    }
 
     if (strcmp(word, "dev_type") == 0) {
       buf[strlen(buf) - 1] = 0; // chomp newline
@@ -83,7 +98,10 @@ void process_chipfile(char *fname) {
     } else if (strcmp(word, "flash_type") == 0) {
       buf[strlen(buf) - 1] = 0; // chomp newline
       sscanf(buf, "%*s %n", &nc);
-      if (strcmp(value, "F0_F1_F3") == 0) {
+      // Match human readable flash_type with enum stm32_flash_type { }.
+      if(strcmp(value, "C0") == 0) {
+        ts->flash_type = STM32_FLASH_TYPE_C0;
+      } else if (strcmp(value, "F0_F1_F3") == 0) {
         ts->flash_type = STM32_FLASH_TYPE_F0_F1_F3;
       } else if (strcmp(value, "F1_XL") == 0) {
         ts->flash_type = STM32_FLASH_TYPE_F1_XL;
@@ -101,8 +119,8 @@ void process_chipfile(char *fname) {
         ts->flash_type = STM32_FLASH_TYPE_L0_L1;
       } else if (strcmp(value, "L4") == 0) {
         ts->flash_type = STM32_FLASH_TYPE_L4;
-      } else if (strcmp(value, "L5_U5") == 0) {
-        ts->flash_type = STM32_FLASH_TYPE_L5_U5;
+      } else if (strcmp(value, "L5_U5_H5") == 0) {
+        ts->flash_type = STM32_FLASH_TYPE_L5_U5_H5;
       } else if (strcmp(value, "WB_WL") == 0) {
         ts->flash_type = STM32_FLASH_TYPE_WB_WL;
       } else {
@@ -168,6 +186,18 @@ void process_chipfile(char *fname) {
       }
 
       sscanf(value, "%x", &ts->flags);
+    } else if (strcmp(word, "otp_base") == 0) {
+      buf[strlen(buf) - 1] = 0; // chomp newline
+      sscanf(buf, "%*s %n", &nc);
+      if (sscanf(value, "%i", &ts->otp_base) < 1) {
+        fprintf(stderr, "Failed to parse option size\n");
+      }
+    } else if (strcmp(word, "otp_size") == 0) {
+      buf[strlen(buf) - 1] = 0; // chomp newline
+      sscanf(buf, "%*s %n", &nc);
+      if (sscanf(value, "%i", &ts->otp_size) < 1) {
+        fprintf(stderr, "Failed to parse option size\n");
+      }
     } else {
       fprintf(stderr, "Unknown keyword in %s: %s\n", fname, word);
     }
@@ -182,7 +212,7 @@ void process_chipfile(char *fname) {
 
 void init_chipids(char *dir_to_scan) {
   DIR *d;
-  size_t nl; // namelen
+  uint32_t nl; // namelen
   struct dirent *dir;
 
   if (!dir_to_scan) {
@@ -209,6 +239,7 @@ void init_chipids(char *dir_to_scan) {
     return;
   }
 }
+
 #endif // STLINK_HAVE_DIRENT_H
 
 #if defined(_WIN32) && !defined(STLINK_HAVE_DIRENT_H)

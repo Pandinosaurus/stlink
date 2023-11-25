@@ -1,6 +1,16 @@
+/*
+ * File: calculate.c
+ *
+ * Calculation of sector numbers and pages
+ */
+
+#include <stdint.h>
+
 #include <stlink.h>
 #include "calculate.h"
+
 #include "common_flash.h"
+#include "read_write.h"
 
 uint32_t calculate_F4_sectornum(uint32_t flashaddr) {
   uint32_t offset = 0;
@@ -38,8 +48,7 @@ uint32_t calculate_F7_sectornum(uint32_t flashaddr) {
   }
 }
 
-uint32_t calculate_H7_sectornum(stlink_t *sl, uint32_t flashaddr,
-                                unsigned bank) {
+uint32_t calculate_H7_sectornum(stlink_t *sl, uint32_t flashaddr, uint32_t bank) {
   flashaddr &=
       ~((bank == BANK_1)
             ? STM32_FLASH_BASE
@@ -51,15 +60,15 @@ uint32_t calculate_H7_sectornum(stlink_t *sl, uint32_t flashaddr,
 uint32_t calculate_L4_page(stlink_t *sl, uint32_t flashaddr) {
   uint32_t bker = 0;
   uint32_t flashopt;
-  stlink_read_debug32(sl, STM32L4_FLASH_OPTR, &flashopt);
+  stlink_read_debug32(sl, FLASH_L4_OPTR, &flashopt);
   flashaddr -= STM32_FLASH_BASE;
 
   if (sl->chip_id == STM32_CHIPID_L4 ||
       sl->chip_id == STM32_CHIPID_L496x_L4A6x ||
       sl->chip_id == STM32_CHIPID_L4Rx) {
-    // this chip use dual banked flash
-    if (flashopt & (uint32_t)(1lu << STM32L4_FLASH_OPTR_DUALBANK)) {
-      uint32_t banksize = (uint32_t)sl->flash_size / 2;
+    // these chips use dual bank flash
+    if (flashopt & (uint32_t)(1lu << FLASH_L4_OPTR_DUALBANK)) {
+      uint32_t banksize = sl->flash_size / 2;
 
       if (flashaddr >= banksize) {
         flashaddr -= banksize;
@@ -70,5 +79,5 @@ uint32_t calculate_L4_page(stlink_t *sl, uint32_t flashaddr) {
 
   // For 1MB chips without the dual-bank option set, the page address will
   // overflow into the BKER bit, which gives us the correct bank:page value.
-  return (bker | flashaddr / (uint32_t)sl->flash_pgsz);
+  return (bker | flashaddr / sl->flash_pgsz);
 }
